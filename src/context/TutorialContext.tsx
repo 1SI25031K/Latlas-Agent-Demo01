@@ -13,7 +13,7 @@ export const TUTORIAL_MESSAGES: Record<number, string> = {
 }
 
 const COMPLETE_MESSAGE =
-  'デモを完了しました。ここからは自由にお試しください。'
+  'これでチュートリアルは終了です。ここからは自由にお試しください。'
 
 type TutorialContextValue = {
   tutorialStep: number

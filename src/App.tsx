@@ -245,7 +245,7 @@ export default function App() {
   }
 
   const handleMirrorApprovedStart = () => {
-    if (tutorialStep === 6) nextStep()
+    if (tutorialStep === 6) complete()
     setPopoverOpen(false)
     setMirrorFlowStep('idle')
     setMirrorRequestClassName(null)
@@ -436,6 +436,20 @@ export default function App() {
         </>
       )}
 
+      {/* チュートリアル終了後のメモ：どの操作でどんなギミックが見られるか */}
+      {tutorialStep === 0 && (
+        <div
+          className="fixed left-6 bottom-6 z-40 w-64 rounded-xl border border-white/20 bg-white/90 px-3 py-2.5 shadow-lg text-left"
+          style={{ backdropFilter: 'blur(8px)' }}
+        >
+          <p className="text-[10px] font-medium text-gray-500 mb-1.5 uppercase tracking-wide">デモのギミック</p>
+          <ul className="text-xs text-gray-700 space-y-1">
+            <li>・<strong>自然科学総合実験</strong> → 記録開始から10秒で試験モードのリクエストが届きます</li>
+            <li>・<strong>課題アプローチ</strong> → 同じWiFiにいない時に出るプライバシー保護メッセージを確認できます</li>
+            <li>・<strong>新規追加</strong> → クラスコードを入力すると「デザイン思考3」が一覧に追加されます</li>
+          </ul>
+        </div>
+      )}
     </div>
   )
 }
