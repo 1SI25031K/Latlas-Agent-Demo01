@@ -5,9 +5,10 @@ type Props = {
   classes: ClassItem[]
   onSelect: (className: string) => void
   onBack: () => void
+  tutorialStep?: number
 }
 
-export function MirrorClassSelectView({ classes, onSelect, onBack }: Props) {
+export function MirrorClassSelectView({ classes, onSelect, onBack, tutorialStep }: Props) {
   return (
     <div className="animate-fade-in flex flex-col h-full">
       <button
@@ -23,12 +24,14 @@ export function MirrorClassSelectView({ classes, onSelect, onBack }: Props) {
       <ul className="flex-1 min-h-0 overflow-y-auto space-y-0.5 -mx-1">
         {classes.map((c) => {
           const Icon = CLASS_ICONS[c.icon]
+          const step5Highlight = tutorialStep === 5 && c.instructor === 'Sarah Jenkins'
           return (
             <li key={c.name}>
               <button
                 onClick={() => onSelect(c.name)}
                 type="button"
                 className="w-full flex items-center gap-2 px-2 py-2.5 rounded-[18px] hover:bg-black/5 text-left transition-colors border border-transparent hover:border-gray-200/80"
+                {...(step5Highlight ? { 'data-tutorial-step': '5' } : {})}
               >
                 <span className="shrink-0 w-8 h-8 rounded-[14px] flex items-center justify-center text-gray-500 border border-gray-200/80 bg-white/60">
                   {Icon && <Icon className="w-4 h-4" strokeWidth={1.8} />}

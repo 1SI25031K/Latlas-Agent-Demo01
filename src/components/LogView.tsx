@@ -11,6 +11,9 @@ type Props = {
   isExamMode?: boolean
   onBack?: () => void
   onStopClick?: () => void
+  tutorialStep?: number
+  /** 記録停止確認ポップアップ表示中は、ステップ4のスポットライトを停止ボタンではなくダイアログの「はい」に移す */
+  showConfirmStopPopup?: boolean
 }
 
 export function LogView({
@@ -19,6 +22,8 @@ export function LogView({
   isExamMode = false,
   onBack,
   onStopClick,
+  tutorialStep,
+  showConfirmStopPopup = false,
 }: Props) {
   return (
     <div className="animate-fade-in flex flex-col h-full min-h-0">
@@ -42,6 +47,7 @@ export function LogView({
             className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-red-500 hover:bg-red-600 text-white transition-colors border border-red-400/50 shadow-md"
             aria-label="記録を停止"
             title="記録を停止"
+            {...(tutorialStep === 4 && !showConfirmStopPopup ? { 'data-tutorial-step': '4' } : {})}
           >
             <Square className="w-3.5 h-3.5 fill-current" />
           </button>

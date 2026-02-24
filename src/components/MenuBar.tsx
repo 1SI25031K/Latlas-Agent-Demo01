@@ -14,14 +14,16 @@ type Props = {
   menuBarLabel: string
   onLatlasClick: () => void
   popoverOpen?: boolean
+  tutorialStep?: number
 }
 
-export function MenuBar({ menuBarLabel, onLatlasClick, popoverOpen = false }: Props) {
+export function MenuBar({ menuBarLabel, onLatlasClick, popoverOpen = false, tutorialStep }: Props) {
   const useMonospace = menuBarLabel !== 'Latlas'
 
   return (
     <header
       className="fixed top-0 left-0 right-0 z-[50] h-9 flex items-center justify-between px-4"
+      {...(tutorialStep === 3 ? { 'data-tutorial-step': '3' } : {})}
       style={{
         background: 'rgba(255,255,255,0.75)',
         backdropFilter: 'blur(12px)',
@@ -47,6 +49,7 @@ export function MenuBar({ menuBarLabel, onLatlasClick, popoverOpen = false }: Pr
         onClick={onLatlasClick}
         className="flex items-center gap-1.5 px-3 py-1.5 rounded-md hover:bg-black/5 transition-colors absolute left-1/2 -translate-x-1/2"
         aria-expanded={popoverOpen}
+        {...(tutorialStep === 1 ? { 'data-tutorial-step': '1' } : {})}
       >
         <GraduationCap className="w-4 h-4 text-gray-800 shrink-0" strokeWidth={2} />
         <span

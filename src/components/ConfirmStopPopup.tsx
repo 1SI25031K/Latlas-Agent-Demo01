@@ -1,10 +1,11 @@
 type Props = {
   onCancel: () => void
   onStop: () => void
+  tutorialStep?: number
 }
 
 /** ポップオーバー枠内に表示 */
-export function ConfirmStopPopup({ onCancel, onStop }: Props) {
+export function ConfirmStopPopup({ onCancel, onStop, tutorialStep }: Props) {
   return (
     <div
       className="absolute inset-0 z-10 flex items-center justify-center p-4 animate-spring-in"
@@ -31,6 +32,7 @@ export function ConfirmStopPopup({ onCancel, onStop }: Props) {
             <button
               onClick={onStop}
               className="flex-1 py-2.5 px-4 text-sm font-medium text-white bg-red-500 hover:bg-red-600 rounded-xl transition-colors"
+              {...(tutorialStep === 4 ? { 'data-tutorial-step': '4' } : {})}
             >
               はい
             </button>

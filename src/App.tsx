@@ -13,6 +13,7 @@ import { MirrorRequestSentView } from './components/MirrorRequestSentView'
 import { MirrorApprovedConfirmPopup } from './components/MirrorApprovedConfirmPopup'
 import { MirroringBlockAlert } from './components/MirroringBlockAlert'
 import { MenuBar } from './components/MenuBar'
+import { useTutorial } from './context/TutorialContext'
 import { INITIAL_CLASSES, NEW_CLASS_ON_ADD, type ClassItem } from './data/classes'
 import { ACTIVITY_LOG_MESSAGES, type ActivityLogEntry } from './activityLogSeed'
 
@@ -44,6 +45,7 @@ const CLASS_ID_KADAI = '課題アプローチ'
 const CLASS_ID_NATURE = '自然科学総合実験'
 
 export default function App() {
+  const { tutorialStep, nextStep, complete, setStep2ConfirmOpen, setStep4ConfirmOpen, setStep6ConfirmOpen } = useTutorial()
   const [classes, setClasses] = useState<ClassItem[]>(INITIAL_CLASSES)
   const [view, setView] = useState<View>('list')
   const [popoverOpen, setPopoverOpen] = useState(false)
@@ -65,7 +67,6 @@ export default function App() {
   const [mirrorStartTime, setMirrorStartTime] = useState<number | null>(null)
   const [mirrorNow, setMirrorNow] = useState(() => Date.now())
   const [confirmMirrorStopOpen, setConfirmMirrorStopOpen] = useState(false)
-  const [mirrorStopMessageVisible, setMirrorStopMessageVisible] = useState(false)
   const [showMirroringBlockAlert, setShowMirroringBlockAlert] = useState(false)
   const [examCountdownSeconds, setExamCountdownSeconds] = useState(600)
   const examModeRequestShownRef = useRef(false)
@@ -74,6 +75,18 @@ export default function App() {
   const elapsedSeconds = startTime
     ? Math.max(0, Math.floor((now - startTime) / 1000))
     : 0
+
+  useEffect(() => {
+    setStep2ConfirmOpen(confirmClass !== null)
+  }, [confirmClass, setStep2ConfirmOpen])
+
+  useEffect(() => {
+    setStep4ConfirmOpen(confirmStopOpen)
+  }, [confirmStopOpen, setStep4ConfirmOpen])
+
+  useEffect(() => {
+    setStep6ConfirmOpen(mirrorFlowStep === 'approved_confirm')
+  }, [mirrorFlowStep, setStep6ConfirmOpen])
 
   useEffect(() => {
     if (!startTime) return
@@ -190,10 +203,13 @@ export default function App() {
       setShowWifiWarning(true)
       return
     }
+    if (tutorialStep === 2) nextStep()
+    if (tutorialStep === 7 && confirmClass === CLASS_ID_NATURE) nextStep()
     openLog(confirmClass)
   }
 
   const handleWifiWarningStart = () => {
+    if (tutorialStep === 9) complete()
     if (confirmClass) openLog(confirmClass)
     setShowWifiWarning(false)
   }
@@ -213,6 +229,7 @@ export default function App() {
 
   const handleStopClick = () => setConfirmStopOpen(true)
   const handleConfirmStop = () => {
+    if (tutorialStep === 4) nextStep()
     stopRecordingAndGoToList()
   }
 
@@ -222,11 +239,13 @@ export default function App() {
   }
 
   const handleMirrorClassSelect = (className: string) => {
+    if (tutorialStep === 5 && className === 'Intensive English JI') nextStep()
     setMirrorRequestClassName(className)
     setMirrorFlowStep('request_sent')
   }
 
   const handleMirrorApprovedStart = () => {
+    if (tutorialStep === 6) nextStep()
     setPopoverOpen(false)
     setMirrorFlowStep('idle')
     setMirrorRequestClassName(null)
@@ -244,11 +263,10 @@ export default function App() {
     setIsMirroring(false)
     setMirrorStartTime(null)
     setMirrorStartPhase('idle')
-    setMirrorStopMessageVisible(true)
-    setTimeout(() => setMirrorStopMessageVisible(false), 3000)
   }
 
   const handleAddComplete = () => {
+    if (tutorialStep === 8) nextStep()
     setClasses((prev) => [...prev, NEW_CLASS_ON_ADD])
     setView('list')
   }
@@ -277,6 +295,7 @@ export default function App() {
           classes={classes}
           onSelect={handleMirrorClassSelect}
           onBack={() => setMirrorFlowStep('idle')}
+          tutorialStep={tutorialStep}
         />
       )}
       {(mirrorFlowStep === 'request_sent' || mirrorFlowStep === 'approved_confirm') &&
@@ -289,6 +308,7 @@ export default function App() {
         <MirrorApprovedConfirmPopup
           onStart={handleMirrorApprovedStart}
           onCancel={handleMirrorApprovedCancel}
+          tutorialStep={tutorialStep}
         />
       )}
       {mirrorFlowStep === 'idle' && view === 'entry' && (
@@ -303,6 +323,8 @@ export default function App() {
           onRecordingBannerClick={recordingClassName ? goToLogView : undefined}
           isMirroring={isMirroring}
           onMirrorClick={handleMirrorClick}
+          tutorialStep={tutorialStep}
+          showConfirmStartPopup={confirmClass !== null}
         />
       )}
       {mirrorFlowStep === 'idle' && view === 'log' && (
@@ -314,6 +336,8 @@ export default function App() {
           }
           onBack={openList}
           onStopClick={handleStopClick}
+          tutorialStep={tutorialStep}
+          showConfirmStopPopup={confirmStopOpen}
         />
       )}
 
@@ -323,6 +347,7 @@ export default function App() {
           className={confirmClass}
           onCancel={() => setConfirmClass(null)}
           onStart={handleConfirmStart}
+          tutorialStep={tutorialStep}
         />
       )}
       {showWifiWarning && confirmClass === CLASS_ID_KADAI && (
@@ -339,6 +364,7 @@ export default function App() {
         <ConfirmStopPopup
           onCancel={() => setConfirmStopOpen(false)}
           onStop={handleConfirmStop}
+          tutorialStep={tutorialStep}
         />
       )}
       {confirmSwitchClass !== null && (
@@ -378,8 +404,14 @@ export default function App() {
     >
       <MenuBar
         menuBarLabel={menuBarLabel}
-        onLatlasClick={() => setPopoverOpen((o) => !o)}
+        onLatlasClick={() => {
+          setPopoverOpen((o) => {
+            if (!o && tutorialStep === 1) nextStep()
+            return !o
+          })
+        }}
         popoverOpen={popoverOpen}
+        tutorialStep={tutorialStep}
       />
 
       <main className="flex-1" aria-hidden="true" />
@@ -392,7 +424,7 @@ export default function App() {
             onClick={() => setPopoverOpen(false)}
           />
           <div
-            className="fixed left-1/2 top-10 z-50 w-[320px] -translate-x-1/2 overflow-hidden animate-spring-scale rounded-xl bg-white/95 shadow-xl"
+            className="fixed left-1/2 top-10 z-50 w-[320px] -translate-x-1/2 overflow-hidden animate-spring-scale-center rounded-xl bg-white/95 shadow-xl"
             style={{
               border: '0.5px solid rgba(0,0,0,0.08)',
               backdropFilter: 'blur(12px)',
@@ -404,17 +436,6 @@ export default function App() {
         </>
       )}
 
-      {/* ミラーリング停止メッセージ（3秒間表示しフェードアウト） */}
-      {mirrorStopMessageVisible && (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 animate-mirror-stop"
-          aria-live="polite"
-        >
-          <p className="text-white text-lg font-medium bg-gray-900/90 px-6 py-4 rounded-[20px] shadow-xl">
-            ミラーリングを停止しました。
-          </p>
-        </div>
-      )}
     </div>
   )
 }

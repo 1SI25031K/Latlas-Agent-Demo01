@@ -1,9 +1,10 @@
 type Props = {
   onStart: () => void
   onCancel: () => void
+  tutorialStep?: number
 }
 
-export function MirrorApprovedConfirmPopup({ onStart, onCancel }: Props) {
+export function MirrorApprovedConfirmPopup({ onStart, onCancel, tutorialStep }: Props) {
   return (
     <div
       className="absolute inset-0 z-10 flex items-center justify-center p-4 animate-spring-in"
@@ -29,6 +30,7 @@ export function MirrorApprovedConfirmPopup({ onStart, onCancel }: Props) {
             <button
               onClick={onStart}
               className="flex-1 py-2.5 px-4 text-sm font-medium text-white bg-blue-500 hover:bg-blue-600 rounded-[18px] transition-colors"
+              {...(tutorialStep === 6 ? { 'data-tutorial-step': '6' } : {})}
             >
               開始
             </button>

@@ -10,6 +10,9 @@ type Props = {
   onRecordingBannerClick?: () => void
   isMirroring?: boolean
   onMirrorClick?: () => void
+  tutorialStep?: number
+  /** 記録開始確認ポップアップ表示中は、ステップ2のスポットライトをリスト行ではなくポップアップ側に移すため */
+  showConfirmStartPopup?: boolean
 }
 
 export function ListView({
@@ -20,6 +23,8 @@ export function ListView({
   onRecordingBannerClick,
   isMirroring = false,
   onMirrorClick,
+  tutorialStep,
+  showConfirmStartPopup = false,
 }: Props) {
   const [search, setSearch] = useState('')
   const filterRecent = '最近'
@@ -57,6 +62,7 @@ export function ListView({
         <button
           onClick={onAddNew}
           className="shrink-0 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-[18px] border border-white/20 transition-colors"
+          {...(tutorialStep === 8 ? { 'data-tutorial-step': '8' } : {})}
         >
           新規追加
         </button>
@@ -68,6 +74,7 @@ export function ListView({
             }`}
             title={isMirroring ? 'ミラーリングを停止' : 'ミラーリングをリクエスト'}
             aria-label={isMirroring ? 'ミラーリングを停止' : 'ミラーリングをリクエスト'}
+            {...(tutorialStep === 5 ? { 'data-tutorial-step': '5' } : {})}
           >
             <Cast className="w-5 h-5" />
           </button>
@@ -82,11 +89,15 @@ export function ListView({
       <ul className="flex-1 overflow-y-auto space-y-0.5 -mx-1">
         {filtered.map((c) => {
           const Icon = CLASS_ICONS[c.icon]
+          const step2Highlight = tutorialStep === 2 && !showConfirmStartPopup && c.name === 'Intensive English JI'
+          const step7Highlight = tutorialStep === 7 && c.name === '自然科学総合実験'
+          const step9Highlight = tutorialStep === 9 && c.name === '課題アプローチ'
           return (
             <li key={c.name}>
               <button
                 onClick={() => onSelectClass?.(c.name)}
                 className="w-full flex items-center gap-2 px-2 py-2 rounded-[18px] hover:bg-black/5 text-left transition-colors"
+                {...(step2Highlight ? { 'data-tutorial-step': '2' } : step7Highlight ? { 'data-tutorial-step': '7' } : step9Highlight ? { 'data-tutorial-step': '9' } : {})}
               >
                 <span
                   className="shrink-0 w-8 h-8 rounded-[14px] flex items-center justify-center text-gray-500 border border-gray-200/80 bg-white/60"

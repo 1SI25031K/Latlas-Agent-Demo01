@@ -15,6 +15,7 @@ export default {
         'mirror-stop': 'mirrorStopFade 3s ease-out forwards',
         'spring-in': 'springIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1)',
         'spring-scale': 'springScale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'spring-scale-center': 'springScaleCenter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
       },
       keyframes: {
         fadeIn: {
@@ -38,6 +39,11 @@ export default {
         springScale: {
           '0%': { opacity: '0', transform: 'scale(0.92)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        /* 左中央配置要素用：アニメーション中も translateX(-50%) を維持 */
+        springScaleCenter: {
+          '0%': { opacity: '0', transform: 'translateX(-50%) scale(0.92)' },
+          '100%': { opacity: '1', transform: 'translateX(-50%) scale(1)' },
         },
       },
       backdropBlur: {
