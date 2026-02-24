@@ -9,7 +9,7 @@ function renderMessage(text: string) {
 }
 
 export function TutorialOverlay() {
-  const { tutorialStep, nextStep, skip, complete, isActive, isComplete, message, step2ConfirmOpen, step3Countdown, setStep3Countdown, step4ConfirmOpen, step6ConfirmOpen, viewPauseSeconds, setViewPauseSeconds } =
+  const { tutorialStep, nextStep, skip, isActive, message, step2ConfirmOpen, step3Countdown, setStep3Countdown, step4ConfirmOpen, step6ConfirmOpen, viewPauseSeconds, setViewPauseSeconds } =
     useTutorial()
   const [targetRect, setTargetRect] = useState<DOMRect | null>(null)
   const prevStepRef = useRef(tutorialStep)
@@ -27,7 +27,7 @@ export function TutorialOverlay() {
   useEffect(() => {
     if (viewPauseSeconds === null || viewPauseSeconds <= 0) return
     const id = setInterval(() => {
-      setViewPauseSeconds((s) => (s === null || s <= 1 ? null : s - 1))
+      setViewPauseSeconds((s: number | null) => (s === null || s <= 1 ? null : s - 1))
     }, 1000)
     return () => clearInterval(id)
   }, [viewPauseSeconds, setViewPauseSeconds])
@@ -36,7 +36,7 @@ export function TutorialOverlay() {
   useEffect(() => {
     if (step3Countdown === null || step3Countdown <= 0) return
     const id = setInterval(() => {
-      setStep3Countdown((c) => {
+      setStep3Countdown((c: number | null) => {
         if (c === null || c <= 0) return null
         if (c === 1) {
           nextStep()

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, type ReactNode, type SetStateAction, type Dispatch } from 'react'
 
 export const TUTORIAL_MESSAGES: Record<number, string> = {
   1: 'デモへようこそ。Latlasは、学習プロセスを可視化し、適切な評価と支援につなげるエージェントです。まずはメニューバーの **"Latlas"** をクリックして、操作パネルを開いてください。',
@@ -15,7 +15,7 @@ export const TUTORIAL_MESSAGES: Record<number, string> = {
 const COMPLETE_MESSAGE =
   'これでチュートリアルは終了です。ここからは自由にお試しください。'
 
-type TutorialContextValue = {
+export type TutorialContextValue = {
   tutorialStep: number
   nextStep: () => void
   skip: () => void
@@ -29,7 +29,7 @@ type TutorialContextValue = {
   setStep2ConfirmOpen: (open: boolean) => void
   /** ステップ3で「次へ」押下後のカウントダウン（5→0）。0でステップ4へ */
   step3Countdown: number | null
-  setStep3Countdown: (v: number | null) => void
+  setStep3Countdown: Dispatch<SetStateAction<number | null>>
   /** ステップ4で「記録を停止しますか？」表示中なら true。オーバーレイの再計測用 */
   step4ConfirmOpen: boolean
   setStep4ConfirmOpen: (open: boolean) => void
@@ -38,14 +38,17 @@ type TutorialContextValue = {
   setStep6ConfirmOpen: (open: boolean) => void
   /** 操作と操作の間で「枠なしで全体を見る」秒数。0で通常の枠表示に戻る */
   viewPauseSeconds: number | null
-  setViewPauseSeconds: (v: number | null) => void
+  setViewPauseSeconds: Dispatch<SetStateAction<number | null>>
 }
 
 const TutorialContext = createContext<TutorialContextValue | null>(null)
 
-export function useTutorial() {
-  const ctx = useContext(TutorialContext)
-  return ctx
+export function useTutorial(): TutorialContextValue {
+  const context = useContext(TutorialContext)
+  if (!context) {
+    throw new Error('useTutorial must be used within a TutorialProvider')
+  }
+  return context
 }
 
 type Props = { children: ReactNode }
